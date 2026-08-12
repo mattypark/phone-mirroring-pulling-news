@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "phone-mirroring-pulling-news/profiles/schema.json",
+  "title": "Capture profile",
+  "description": "One feed app, and how to scroll it. Read-only by construction: no like/follow/comment/DM verb exists in this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "app", "capture", "actions", "abort"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Profile id. Used as `--profile <name>` and in the digest filename."
+    },
+    "app": {
+      "type": "string",
+      "description": "App name as it appears in iOS Spotlight, used to launch it inside the mirror."
+    },
+    "kind": {
+      "enum": ["mirror", "feed"],
+      "default": "mirror",
+      "description": "mirror = screenshots via iPhone Mirroring. feed = text over HTTP, no phone involved."
+    },
+    "description": {
+      "type": "string",
+      "description": "What this feed is for, in one line. Shows up in the digest header."
+    },
+
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxFrames", "maxMinutes", "dwellMs", "scrollTicks"],
+      "properties": {
+        "maxFrames": {
+          "type": "integer", "minimum": 1, "maximum": 400,
+          "description": "Hard ceiling on frames. Each frame costs vision tokens — budget deliberately."
+        },
+        "maxMinutes": {
+          "type": "number", "minimum": 0.5, "maximum": 60,
+          "description": "Wall-clock ceiling. Whichever limit hits first ends the run."
+        },
+        "dwellMs": {
+          "type": "integer", "minimum": 250, "maximum": 15000,
+          "description": "Pause after each scroll. Human pace, and gives the feed time to render."
+        },
+        "scrollTicks": {
+          "type": "integer", "minimum": 1, "maximum": 40,
+          "description": "Scroll wheel ticks per step. Video feeds want a full-screen jump; text feeds want less."
+        },
+        "settleMs": {
+          "type": "integer", "minimum": 0, "maximum": 10000, "default": 1200,
+          "description": "Extra wait after launching the app, before the first frame."
+        },
+        "downscaleWidth": {
+          "type": "integer", "minimum": 320, "maximum": 1600, "default": 640,
+          "description": "Frames are resized to this width before Claude reads them. Lower = cheaper."
+        },
+        "jpegQuality": {
+          "type": "integer", "minimum": 30, "maximum": 95, "default": 60
+        },
+        "bannerStripPx": {
+          "type": "integer", "minimum": 0, "maximum": 400, "default": 60,
+          "description": "Top band blanked on every frame so notification banners are never recorded."
+        },
+        "dedupe": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "hammingThreshold": {
+              "type": "integer", "minimum": 0, "maximum": 64, "default": 6,
+              "description": "Perceptual-hash distance below which a frame is treated as a repeat and dropped."
+            },
+            "lookback": {
+              "type": "integer", "minimum": 1, "maximum": 10, "default": 3,
+              "description": "How many recent frames a new frame is compared against."
+            }
+          }
+        }
+      }
+    },
+
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["scroll", "home", "tap:navOnly"] },
+      "description": "Everything the run is permitted to do. tap:navOnly means taps confined to the navigation regions declared in navTargets."
+    },
+
+    "navTargets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minItems": 2, "maxItems": 2
+      },
+      "description": "Named tap points as fractions of the mirror window, e.g. \"followingTab\": [0.72, 0.11]. Only these coordinates are tappable."
+    },
+
+    "abort": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stuckFrames"],
+      "properties": {
+        "stuckFrames": {
+          "type": "integer", "minimum": 2, "maximum": 20,
+          "description": "Identical frames in a row before giving up — means mirroring paused, the phone was picked up, or the feed ended."
+        },
+        "blankFrames": {
+          "type": "integer", "minimum": 1, "maximum": 20, "default": 3,
+          "description": "Near-uniform frames in a row before giving up — means a black DRM surface or a disconnected session."
+        },
+        "readerStopOn": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": ["login", "sign in", "password", "verification code", "two-factor", "payment", "card number", "direct message"],
+          "description": "If Claude sees any of these while reading frames, it stops the run and deletes the remaining frames. Enforced at read time, not by pixels."
+        }
+      }
+    },
+
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["rss", "atom", "hn", "reddit-json", "json"] },
+          "url": { "type": "string", "format": "uri" },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 15 }
+        }
+      },
+      "description": "Only for kind=feed. Text sources fetched over HTTP — no phone, no vision tokens."
+    },
+
+    "interests": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Topics that push an item up the digest. Everything else is summarised as noise."
+    }
+  }
+}

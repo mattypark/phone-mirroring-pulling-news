@@ -1,0 +1,18 @@
+# Compiled Swift binary — rebuilt with `make` / `scripts/build.sh`
+bin/mirrorctl
+bin/*.dSYM/
+
+# Capture runs: screenshots of a personal phone. Never leaves this machine.
+runs/
+
+# Generated digests (the vault copy is the canonical one)
+digests/*.md
+
+# Env — real values live only in .env.local, never committed
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# macOS
+.DS_Store
