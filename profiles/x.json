@@ -1,0 +1,42 @@
+{
+  "name": "x",
+  "kind": "mirror",
+  "app": "X",
+  "description": "The X timeline — the densest text-per-frame feed, and the cheapest to read.",
+
+  "capture": {
+    "maxFrames": 60,
+    "maxMinutes": 6,
+    "dwellMs": 900,
+    "scrollTicks": 6,
+    "settleMs": 1800,
+    "downscaleWidth": 640,
+    "jpegQuality": 60,
+    "bannerStripPx": 60,
+    "dedupe": { "hammingThreshold": 6, "lookback": 3 }
+  },
+
+  "actions": ["scroll", "home", "tap:navOnly"],
+  "navTargets": {
+    "followingTab": [0.72, 0.115],
+    "forYouTab": [0.28, 0.115],
+    "scrollToTop": [0.5, 0.055]
+  },
+
+  "abort": {
+    "stuckFrames": 4,
+    "blankFrames": 3,
+    "readerStopOn": [
+      "log in", "sign in", "password", "verification code", "two-factor",
+      "payment", "card number", "direct message", "messages"
+    ]
+  },
+
+  "interests": [
+    "AI model releases and capability claims",
+    "developer tooling and agent frameworks",
+    "startup and fundraising news",
+    "college admissions and Stanford",
+    "design and frontend craft"
+  ]
+}

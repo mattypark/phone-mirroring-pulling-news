@@ -5,7 +5,8 @@
   "description": "One feed app, and how to scroll it. Read-only by construction: no like/follow/comment/DM verb exists in this schema.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "app", "capture", "actions", "abort"],
+  "required": ["name", "kind"],
+  "comment": "Kind-specific requirements (mirror needs app/capture/actions/abort, feed needs sources) are enforced in scripts/lib/profile.mjs, which reports them in plain language.",
   "properties": {
     "name": {
       "type": "string",
@@ -18,7 +19,6 @@
     },
     "kind": {
       "enum": ["mirror", "feed"],
-      "default": "mirror",
       "description": "mirror = screenshots via iPhone Mirroring. feed = text over HTTP, no phone involved."
     },
     "description": {

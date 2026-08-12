@@ -29,7 +29,8 @@ USAGE
   mirrorctl winid                       print the window id, or exit 1 if not found
   mirrorctl bounds                      print window geometry as JSON
   mirrorctl focus                       bring iPhone Mirroring to the front
-  mirrorctl shot <path.png>             screenshot the window
+  mirrorctl shot <path.png> [--strip N] screenshot the window, dropping N points
+                                        off the top (status bar / notification banners)
   mirrorctl scroll <ticks>              scroll the feed down (negative = up)
   mirrorctl tap <fx> <fy>               click at a point, given as 0..1 fractions
   mirrorctl swipe <fx1> <fy1> <fx2> <fy2> [--ms 350]
@@ -233,11 +234,23 @@ func press(key name: String) {
 
 // MARK: - Screenshot
 
-func capture(windowID: CGWindowID, to path: String) {
+func capture(window: MirrorWindow, to path: String, stripTop: Int) {
     let process = Process()
     process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-    // -o drops the window shadow, -x silences the shutter sound.
-    process.arguments = ["-o", "-x", "-l", String(windowID), path]
+
+    if stripTop > 0 {
+        // Region capture, so the iOS status bar and any notification banner are never
+        // written to disk in the first place. Region shots grab whatever is on screen
+        // in that rectangle, so the window has to be frontmost and unobstructed.
+        requireFrontmost()
+        let rect = window.rect
+        let region = "\(Int(rect.origin.x)),\(Int(rect.origin.y) + stripTop),"
+            + "\(Int(rect.width)),\(Int(rect.height) - stripTop)"
+        process.arguments = ["-x", "-R", region, path]
+    } else {
+        // -o drops the window shadow, -x silences the shutter sound.
+        process.arguments = ["-o", "-x", "-l", String(window.id), path]
+    }
 
     do { try process.run() } catch {
         fail("could not run screencapture: \(error.localizedDescription)")
@@ -299,7 +312,8 @@ case "focus":
 
 case "shot":
     guard args.count >= 2 else { fail("shot needs an output path\n\n\(usage)", code: 2) }
-    capture(windowID: requireWindow().id, to: args[1])
+    let stripTop = Int(flagValue("--strip", in: args) ?? "0") ?? 0
+    capture(window: requireWindow(), to: args[1], stripTop: stripTop)
     print(args[1])
 
 case "scroll":
