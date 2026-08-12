@@ -84,7 +84,15 @@ Or from Claude Code, which does the reading and the writing too:
 ```
 
 Digests land in `~/Documents/ObsidianVault/Digests/YYYY-MM-DD-<profile>.md`, with a
-copy in `digests/`, and a push notification when the run finishes.
+copy in `digests/`, and a push notification when the run finishes. Set
+`VAULT_DIGEST_DIR` to file them somewhere else.
+
+The slash command and skill live in `claude/` — symlink them in:
+
+```sh
+ln -s "$PWD/claude/skills/doomscroll" ~/.claude/skills/doomscroll
+ln -s "$PWD/claude/commands/doomscroll.md" ~/.claude/commands/doomscroll.md
+```
 
 ## Layout
 
@@ -94,10 +102,22 @@ scripts/build.sh         one-line compile
 scripts/capture.mjs      capture loop: shot → downscale → dedupe → scroll → repeat
 scripts/feeds.mjs        text path: HN, RSS, Reddit JSON — no mirroring, no vision tokens
 scripts/digest-write.mjs markdown out to the vault + notification
+scripts/lib/             image fingerprinting, profile validation, XML, a tiny PNG encoder
+prompts/                 what the model is told when it reads frames and builds the digest
 profiles/*.json          per-app scroll cadence, stop rules, allowed actions
 profiles/schema.json     what a profile is allowed to contain
+claude/                  the /doomscroll command and skill, for Claude Code
 runs/<timestamp>/        frames + manifest.json (gitignored — never leaves the machine)
 ```
+
+## How the pieces divide
+
+The deterministic half is code: which app, how fast to scroll, when to stop, which
+frames are worth keeping, what the markdown looks like, where the file goes. The
+judgement half is the model: what a post actually claims, whether it matters, what to
+drop. Keeping the line there means the digest has the same shape every day even though
+its contents are written fresh — and a bad run fails in an obvious, mechanical way
+instead of a plausible-sounding one.
 
 ## Privacy
 
