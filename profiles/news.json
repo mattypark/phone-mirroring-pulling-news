@@ -1,0 +1,20 @@
+{
+  "name": "news",
+  "kind": "feed",
+  "description": "Text sources with public feeds. No phone, no screenshots, effectively no token cost — run this before reaching for the mirror.",
+
+  "sources": [
+    { "id": "hn", "type": "hn", "url": "https://hacker-news.firebaseio.com/v0/topstories.json", "limit": 20 },
+    { "id": "r/technology", "type": "reddit-json", "url": "https://www.reddit.com/r/technology/top.json?t=day&limit=20", "limit": 12 },
+    { "id": "ars-technica", "type": "rss", "url": "https://feeds.arstechnica.com/arstechnica/index", "limit": 10 },
+    { "id": "the-verge", "type": "atom", "url": "https://www.theverge.com/rss/index.xml", "limit": 10 },
+    { "id": "simon-willison", "type": "atom", "url": "https://simonwillison.net/atom/everything/", "limit": 8 }
+  ],
+
+  "interests": [
+    "AI model releases, pricing changes and capability claims",
+    "developer tooling, agents and anything that changes how I build",
+    "startup funding and product launches worth studying",
+    "policy or platform changes that affect shipping software"
+  ]
+}

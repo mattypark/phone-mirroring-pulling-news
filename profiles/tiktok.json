@@ -1,0 +1,35 @@
+{
+  "name": "tiktok",
+  "kind": "mirror",
+  "app": "TikTok",
+  "description": "For You feed. Read at caption level only — stills carry no audio and no motion, so treat every claim here as low confidence.",
+
+  "capture": {
+    "maxFrames": 30,
+    "maxMinutes": 8,
+    "dwellMs": 2600,
+    "scrollTicks": 14,
+    "settleMs": 2500,
+    "downscaleWidth": 720,
+    "jpegQuality": 65,
+    "bannerStripPx": 50,
+    "dedupe": { "hammingThreshold": 9, "lookback": 2 }
+  },
+
+  "actions": ["scroll", "home"],
+
+  "abort": {
+    "stuckFrames": 3,
+    "blankFrames": 2,
+    "readerStopOn": [
+      "log in", "sign in", "password", "verification code", "two-factor",
+      "payment", "card number", "inbox", "friends"
+    ]
+  },
+
+  "interests": [
+    "what a general audience is actually talking about this week",
+    "formats and hooks that are working right now",
+    "AI and tech reaching a non-technical audience"
+  ]
+}

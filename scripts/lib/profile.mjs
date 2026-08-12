@@ -140,8 +140,10 @@ function check(value, schema, path, errors) {
     for (const [key, entry] of Object.entries(known)) {
       if (!(key in result) && entry.default !== undefined) {
         result[key] = structuredClone(entry.default);
-      } else if (!(key in result) && entry.type === "object" && entry.properties) {
-        // Nested optional objects still contribute their own defaults.
+      } else if (!(key in result) && entry.type === "object" && entry.properties && !entry.required) {
+        // An omitted optional object (dedupe, say) still contributes its own defaults.
+        // Objects with required keys are left absent, so the omission is reported
+        // rather than papered over with a half-built default.
         const nested = check({}, entry, `${path}.${key}`, []);
         if (Object.keys(nested).length > 0) result[key] = nested;
       }

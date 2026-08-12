@@ -1,0 +1,36 @@
+{
+  "name": "instagram",
+  "kind": "mirror",
+  "app": "Instagram",
+  "description": "Main feed and stories bar. One post per screen, so scroll in bigger jumps than X.",
+
+  "capture": {
+    "maxFrames": 45,
+    "maxMinutes": 6,
+    "dwellMs": 1400,
+    "scrollTicks": 9,
+    "settleMs": 2200,
+    "downscaleWidth": 700,
+    "jpegQuality": 62,
+    "bannerStripPx": 60,
+    "dedupe": { "hammingThreshold": 7, "lookback": 3 }
+  },
+
+  "actions": ["scroll", "home"],
+
+  "abort": {
+    "stuckFrames": 4,
+    "blankFrames": 3,
+    "readerStopOn": [
+      "log in", "sign in", "password", "verification code", "two-factor",
+      "payment", "card number", "direct message", "your activity"
+    ]
+  },
+
+  "interests": [
+    "what people I know are actually doing",
+    "design, typography and film photography",
+    "brand and campaign work worth stealing from",
+    "events and things happening locally"
+  ]
+}
